@@ -1,53 +1,24 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
+import React, { Component } from 'react'
+import { AppRegistry, StatusBar } from 'react-native'
+import { COLOR, ThemeProvider } from 'react-native-material-ui'
+import Routes from './src/routes'
+// you can set your style right here, it'll be propagated to application
+const uiTheme = {
+  palette: {
+    primaryColor: COLOR.blue600
+  },
+}
 
-import React, { Component } from 'react';
-import {
-  AppRegistry,
-  StyleSheet,
-  Text,
-  View
-} from 'react-native';
+StatusBar.setBackgroundColor(COLOR.blue800)
 
-export default class StandMe extends Component {
+class StandMe extends Component {
   render() {
     return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.android.js
-        </Text>
-        <Text style={styles.instructions}>
-          Double tap R on your keyboard to reload,{'\n'}
-          Shake or press menu button for dev menu
-        </Text>
-      </View>
-    );
+      <ThemeProvider uiTheme={uiTheme}>
+        <Routes />
+      </ThemeProvider>
+    )
   }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
-});
-
-AppRegistry.registerComponent('StandMe', () => StandMe);
+AppRegistry.registerComponent('StandMe', () => StandMe)
