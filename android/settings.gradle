@@ -1,0 +1,3 @@
+rootProject.name = 'StandMe'
+
+include ':app'
