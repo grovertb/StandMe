@@ -10,6 +10,7 @@ import {
   Dimensions 
 } from 'react-native'
 import { Avatar } from 'react-native-material-ui'
+import { Actions }  from 'react-native-router-flux'
 
 const { width, height } = Dimensions.get('window')
 
@@ -82,16 +83,16 @@ export default class Personas extends Component {
 
   
   render() {
-    const { friends } = this.state
+    const { friends, dataSource } = this.state
     return (
       <ListView
         // enableEmptySections={true}
         contentContainerStyle={styles.container}
-        dataSource={this.state.dataSource.cloneWithRows(this.state.friends)}
-        renderRow={(rowData) => {
+        dataSource={dataSource.cloneWithRows(friends)}
+        renderRow={(rowData, sectionID, rowID) => {
           // let color = rowData.done ? COLOR.grey300 : '#ffffff00'
           return (
-            <TouchableOpacity activeOpacity={.5} >
+            <TouchableOpacity activeOpacity={.5} onPress={ () => this._handleChat(rowID) } >
               <View style={styles.roundedButtonContainer}>
                 <View style={styles.imageFriendContainer}>
                   <Image
@@ -101,7 +102,7 @@ export default class Personas extends Component {
                   />
                 </View>
                 <View style={styles.contentNombre}>
-                  <View style={styles.online} />
+                  <View style={[styles.status, styles[rowData.status ? 'bgOnline' : 'bgOffline']]} />
                   <Text style={styles.text}>{rowData.nombre}</Text>
                 </View>
               </View>
@@ -110,6 +111,10 @@ export default class Personas extends Component {
         }}
       />
     )
+  }
+
+  _handleChat(rowID) {
+    Actions.chat(this.state.friends[rowID])
   }
 }
 
@@ -145,12 +150,17 @@ const styles = StyleSheet.create({
     alignItems:'center', 
     justifyContent:'center',
   },
-  online: {
+  status: {
     width: 9,
     height: 9,
     borderRadius: 9/2,
-    backgroundColor: '#42b72a',
     marginRight: 2,
+  },
+  bgOnline : {
+    backgroundColor: '#42b72a',
+  },
+  bgOffline : {
+    backgroundColor: '#de1313',
   }
 })
   

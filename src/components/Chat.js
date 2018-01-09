@@ -1,13 +1,29 @@
-import React, { Component } from 'react';
-import { View, Text } from 'react-native';
+import React, { Component } from 'react'
+import { View, Text, TextInput } from 'react-native'
+import { Toolbar } from 'react-native-material-ui'
+import { Actions }  from 'react-native-router-flux'
 
 export default class Chat extends Component {
-  state = {  }
+
+  constructor(props) {
+    super(props)
+    this.state = {
+      text: ''
+    }
+  }
+
   render() {
+    const { nombre } = this.props
     return (
       <View>
+        <Toolbar
+          key="toolbar"
+          leftElement="arrow-back"
+          onLeftElementPress={() => Actions.pop()}
+          centerElement={nombre}
+        />
         <Text>Chat</Text>
       </View>
-    );
+    )
   }
 }

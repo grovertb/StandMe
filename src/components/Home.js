@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import { View, Text, StyleSheet, ActivityIndicator, StatusBar } from 'react-native'
-import { Button, Toolbar, IconToggle, ActionButton, BottomNavigation } from 'react-native-material-ui'
+import { Button, IconToggle, ActionButton, BottomNavigation } from 'react-native-material-ui'
 
 import Personas from './Personas'
-import Chat from './Chat'
+import Mensajes from './Mensajes'
 import Perfil from './Perfil'
 
 export default class Home extends Component {
@@ -18,8 +18,8 @@ export default class Home extends Component {
     switch (this.state.active) {
       case 'people':
         return <Personas />
-      case 'chat':
-        return <Chat />
+      case 'mensajes':
+        return <Mensajes />
       case 'person':
         return <Perfil />
     }
@@ -30,11 +30,6 @@ export default class Home extends Component {
     return (
       <View style={Styles.card}>
         <View style={{ flex: 1 }}>
-        {/* <Toolbar
-          key="toolbar"
-          leftElement={undefined}
-          centerElement={'StandMe'}
-        /> */}
         {/* { Loading === undefined || Loading ? <ActivityIndicator size={'large'} /> : this._renderContent(data) } */}
         { this._renderContent() }
         </View>
@@ -46,10 +41,10 @@ export default class Home extends Component {
             onPress={() => this.setState({ active: 'people' })}
           />
           <BottomNavigation.Action
-            key="chat"
+            key="mensajes"
             icon="forum"
-            label="Chat"
-            onPress={() => this.setState({ active: 'chat' })}
+            label="Mensajes"
+            onPress={() => this.setState({ active: 'mensajes' })}
           />
           <BottomNavigation.Action
             key="person"
