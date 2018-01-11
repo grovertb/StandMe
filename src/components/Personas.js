@@ -11,6 +11,7 @@ import {
 } from 'react-native'
 import { Avatar } from 'react-native-material-ui'
 import { Actions }  from 'react-native-router-flux'
+import { firebaseDatabase, firebaseAuth } from './../utils/firebase'
 
 const { width, height } = Dimensions.get('window')
 
@@ -20,6 +21,7 @@ export default class Personas extends Component {
 
     const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 })
     this.state = {
+      users: [],
       dataSource: ds,
       friends: [
         {
@@ -81,14 +83,38 @@ export default class Personas extends Component {
     }
   }
 
-  
+  getAllUsers = () => {
+    firebaseDatabase.ref(`users`).once('value').then(snapshot => {
+      const { uid } = firebaseAuth.currentUser,
+            obj     = snapshot.val()
+
+      const dataUsers = Object.keys(obj)
+                        .filter((key) => key.indexOf('b') === -1)
+                        .reduce((newObj, key) => Object.assign(newObj, { [key]: obj[key] }), {})
+
+      this.setState({
+        users: obj
+      })
+    })
+  }
+
+  componentDidMount() {
+    this.getAllUsers()
+  }
+
+  componentWillUnmount() {
+  }
+
   render() {
-    const { friends, dataSource } = this.state
+    const { friends, dataSource, users } = this.state
+
+    console.log('this.props', this.props)
+
     return (
       <ListView
-        // enableEmptySections={true}
+        enableEmptySections={true}
         contentContainerStyle={styles.container}
-        dataSource={dataSource.cloneWithRows(friends)}
+        dataSource={dataSource.cloneWithRows(users)}
         renderRow={(rowData, sectionID, rowID) => {
           // let color = rowData.done ? COLOR.grey300 : '#ffffff00'
           return (
@@ -97,13 +123,13 @@ export default class Personas extends Component {
                 <View style={styles.imageFriendContainer}>
                   <Image
                     // resizeMode="contain"
-                    source={{uri: rowData.fotoPerfil}} 
+                    source={{uri: rowData.photoMini ? rowData.photoMini : 'http://www.aspdotnetstorefront.com/images/Product/medium/988.jpg'}} 
                     style={styles.imageFriend}
                   />
                 </View>
                 <View style={styles.contentNombre}>
                   <View style={[styles.status, styles[rowData.status ? 'bgOnline' : 'bgOffline']]} />
-                  <Text style={styles.text}>{rowData.nombre}</Text>
+                  <Text style={styles.text}>{rowData.displayName}</Text>
                 </View>
               </View>
             </TouchableOpacity>

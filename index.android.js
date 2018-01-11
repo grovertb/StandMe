@@ -21,4 +21,8 @@ class StandMe extends Component {
   }
 }
 
+console.ignoredYellowBox = [
+  'Setting a timer'
+];
+
 AppRegistry.registerComponent('StandMe', () => StandMe)

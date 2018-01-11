@@ -1,17 +1,14 @@
 import React, { Component } from 'react'
 import { View, Text } from 'react-native'
 import { Actions }  from 'react-native-router-flux'
+import { authenticateUser } from '../utils/firebase'
 
 export default class Splash extends Component {
-  constructor(props) {
-    super(props)
-  }
 
   componentDidMount() {
-    setTimeout(() => {
-      // Actions.home()
-      // Actions.login()
-    }, 2000)
+    authenticateUser().then(resolve => {
+      (resolve.success) ? Actions.home() : Actions.login()
+    })
   }
 
   render() {

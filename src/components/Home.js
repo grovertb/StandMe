@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { View, Text, StyleSheet, ActivityIndicator, StatusBar } from 'react-native'
 import { Button, IconToggle, ActionButton, BottomNavigation } from 'react-native-material-ui'
+import { firebaseAuth, firebaseDatabase } from '../utils/firebase'
+
 
 import Personas from './Personas'
 import Mensajes from './Mensajes'
@@ -11,27 +13,25 @@ export default class Home extends Component {
     super(props)
     this.state = {
       active: 'people',
+      users: []
     }
   }
 
-  _renderContent(data) {
-    switch (this.state.active) {
-      case 'people':
-        return <Personas />
-      case 'mensajes':
-        return <Mensajes />
-      case 'person':
-        return <Perfil />
-    }
+  componentDidMount() {
+    this.getUserLocation()
+    this.getUserRefs('all').on('value', this.addUser)
+  }
+
+  componentWillUnmount() {
+    this.getUserRefs('all').off('value', this.addUser)
   }
 
   render() {
-    const { Loading } = this.props
     return (
       <View style={Styles.card}>
         <View style={{ flex: 1 }}>
-        {/* { Loading === undefined || Loading ? <ActivityIndicator size={'large'} /> : this._renderContent(data) } */}
-        { this._renderContent() }
+        { this.state.users.length ? <ActivityIndicator size={'large'} /> : this._renderContent() }
+        {/* { this._renderContent() } */}
         </View>
         <BottomNavigation active={this.state.active} hidden={false} style={{ container: { justifyContent: 'space-between' } }}>
           <BottomNavigation.Action
@@ -55,6 +55,48 @@ export default class Home extends Component {
         </BottomNavigation>
       </View>
     )
+  }
+
+  _renderContent() {
+    const { active, users } = this.state 
+    switch (active) {
+      case 'people':
+        return <Personas users={users} />
+      case 'mensajes':
+        return <Mensajes />
+      case 'person':
+        return <Perfil />
+    }
+  }
+  
+  getUserLocation = () => {
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        const { latitude, longitude } = position.coords
+        this.getUserRefs().update(({ latitude: latitude, longitude: longitude }))
+      },
+      error => console.log('error.message', error.message),
+      {enableHighAccuracy: false, timeout: 20000, maximumAge: 60000},
+    )
+  }
+
+  getUserRefs = (type) => {
+    if(type)
+      return firebaseDatabase.ref('users')
+    else {
+      const { uid } = firebaseAuth.currentUser
+      return firebaseDatabase.ref(`users/${uid}`)
+    }
+  }
+
+  addUser = (data) => {
+    const { uid }   = firebaseAuth.currentUser,
+          users     = data.val(),
+          dataUsers = Object.keys(users).filter((key) => key.indexOf(uid) === -1).reduce((newObj, key) => Object.assign(newObj, { [key]: users[key] }), {})
+
+    this.setState({
+      users: dataUsers
+    })
   }
 }
 

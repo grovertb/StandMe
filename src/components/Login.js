@@ -10,63 +10,65 @@ import {
 } from 'react-native'
 import { Actions }  from 'react-native-router-flux'
 import { Button, COLOR } from 'react-native-material-ui'
-import FBSDK, { LoginManager, AccessToken } from 'react-native-fbsdk'
-import { Icon } from 'react-native-vector-icons'
-
-import firebase, { firebaseAuth } from '../utils/firebase';
-const { FacebookAuthProvider } = firebase.auth;
+import { LoginManager } from 'react-native-fbsdk'
+import { firebaseAuth, firebaseDatabase, authenticateUser } from '../utils/firebase'
 
 StatusBar.setBackgroundColor(COLOR.blueGrey900)
 export default class Login extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      text: ''
+      text: '',
+      users: []
     }
   }
 
   componentDidMount() {
-    this.authenticateUser();
+    this.getUsersRef().on('value', this.addUser)
   }
 
-  authenticateUser = () => {
-    AccessToken.getCurrentAccessToken().then(data => {
-      if(data) {
-        const { accessToken } = data
-        const credential = FacebookAuthProvider.credential(accessToken)
-        firebaseAuth.signInWithCredential(credential).then((credentials) => {
-          Actions.home()
-        }, (error) => {
-          console.log("Sign in error", error)
-        })
-      }
+  componentWillUnmount(){
+    this.getUsersRef().off('value', this.addUser)
+  }
+
+  getUsersRef = () => {
+    let uid = ""
+    if(firebaseAuth.currentUser)
+      uid = firebaseAuth.currentUser.uid
+    return firebaseDatabase.ref(`users/${uid}`)
+  }
+
+  addUser = (data) => {
+    const user = data.val()
+    this.setState({
+      users: user || []
     })
   }
 
-  // handleLoginFinished = (error, result) => {
-  //   if (error) {
-  //     console.error(error)
-  //   } else if (result.isCancelled) {
-  //     console.warn("login is cancelled.");
-  //   } else {
-  //     this.authenticateUser()
-  //   }
-  // }
+  authenticate = () => {
+    authenticateUser().then(resolve => {
+      if(resolve.success) {
+        const { photoURL, displayName, email, uid, providerData: [ { uid: userFB, photoURL: photoMini } ] } = resolve.credentials
+
+        this.getUsersRef().set({
+          photoURL,
+          displayName,
+          email,
+          userFB,
+          photoMini,
+          uid,
+        })
+        Actions.home()
+      }else
+        console.log('Error al iniciar sesión', resolve)
+    })
+    
+  }
 
   fbAuth = () => {
     LoginManager.logInWithReadPermissions(['public_profile']).then(
-      result => {
-        console.log('result')
-        if(result.isCancelled) {
-          alert('Login cancelled')
-        }else {
-          this.authenticateUser()
-        }
-      },
-      error => {
-        console.log('error')
-        alert('Login fail with error:' + error) 
-      }
+      result => (result.isCancelled) ? alert('Login cancelled') : this.authenticate(),
+      error => alert('Login fail with error:' + error) 
     )
   }
 

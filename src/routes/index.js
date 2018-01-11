@@ -11,9 +11,9 @@ export default class Routes extends React.Component {
     return (
       <Router>
         <Scene key="root">
-          <Scene key="splash" component={Splash} hideNavBar />
+          <Scene key="splash" component={Splash} hideNavBar initial/>
           <Scene key="login" component={Login} hideNavBar />
-          <Scene key="home" component={Home} hideNavBar initial />
+          <Scene key="home" component={Home} hideNavBar  />
           <Scene key="chat" component={Chat} hideNavBar />
         </Scene>
       </Router>
