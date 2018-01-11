@@ -93,6 +93,11 @@ android {
     compileSdkVersion 26
     buildToolsVersion '26.0.2'
 
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+    }
+
     defaultConfig {
         applicationId "com.standme"
         minSdkVersion 16
@@ -146,6 +151,7 @@ android {
 dependencies {
     compile project(':react-native-fbsdk')
     compile project(':react-native-vector-icons')
+    compile project(':ReactNativeAutoUpdater')
     compile fileTree(dir: "libs", include: ["*.jar"])
     compile "com.android.support:appcompat-v7:26.1.0"
     compile "com.facebook.react:react-native:+"  // From node_modules
