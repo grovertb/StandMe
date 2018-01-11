@@ -13,14 +13,16 @@ export default class Chat extends Component {
   }
 
   render() {
-    const { nombre } = this.props
+
+    const { displayName } = this.props
+
     return (
       <View>
         <Toolbar
           key="toolbar"
           leftElement="arrow-back"
           onLeftElementPress={() => Actions.pop()}
-          centerElement={nombre}
+          centerElement={displayName}
         />
         <Text>Chat</Text>
       </View>

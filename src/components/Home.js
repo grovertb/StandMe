@@ -18,7 +18,7 @@ export default class Home extends Component {
   }
 
   componentDidMount() {
-    this.getUserLocation()
+    this.getUserUpdate()
     this.getUserRefs('all').on('value', this.addUser)
   }
 
@@ -69,11 +69,11 @@ export default class Home extends Component {
     }
   }
   
-  getUserLocation = () => {
+  getUserUpdate = () => {
     navigator.geolocation.getCurrentPosition(
       position => {
         const { latitude, longitude } = position.coords
-        this.getUserRefs().update(({ latitude: latitude, longitude: longitude }))
+        this.getUserRefs().update(({ latitude: latitude, longitude: longitude, status: true }))
       },
       error => console.log('error.message', error.message),
       {enableHighAccuracy: false, timeout: 20000, maximumAge: 60000},
@@ -93,7 +93,6 @@ export default class Home extends Component {
     const { uid }   = firebaseAuth.currentUser,
           users     = data.val(),
           dataUsers = Object.keys(users).filter((key) => key.indexOf(uid) === -1).reduce((newObj, key) => Object.assign(newObj, { [key]: users[key] }), {})
-
     this.setState({
       users: dataUsers
     })

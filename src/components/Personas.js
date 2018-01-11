@@ -21,94 +21,19 @@ export default class Personas extends Component {
 
     const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 })
     this.state = {
-      users: [],
-      dataSource: ds,
-      friends: [
-        {
-          nombre: 'Daniel',
-          latitude: '-11.903469',
-          longitude: '-77.030887',
-          fotoPerfil: 'http://nativeamerican.jobs/wp-content/uploads/2017/02/person-4-240x240.jpg'
-        },
-        {
-          nombre: 'Anthony',
-          latitude: '-11.891612',
-          longitude: '-77.048232',
-          fotoPerfil: 'http://nativeamerican.jobs/wp-content/uploads/2017/02/person-4-240x240.jpg'
-        },
-        {
-          nombre: 'Angie',
-          latitude: '-11.918928',
-          longitude: '-77.040875',
-          fotoPerfil: 'http://nativeamerican.jobs/wp-content/uploads/2017/02/person-4-240x240.jpg'
-        },
-        {
-          nombre: 'Pedro',
-          latitude: '-11.903469',
-          longitude: '-77.030887',
-          fotoPerfil: 'http://nativeamerican.jobs/wp-content/uploads/2017/02/person-4-240x240.jpg'
-        },
-        {
-          nombre: 'Jose',
-          latitude: '-11.891612',
-          longitude: '-77.048232',
-          fotoPerfil: 'http://nativeamerican.jobs/wp-content/uploads/2017/02/person-4-240x240.jpg'
-        },
-        {
-          nombre: 'Romero',
-          latitude: '-11.918928',
-          longitude: '-77.040875',
-          fotoPerfil: 'http://nativeamerican.jobs/wp-content/uploads/2017/02/person-4-240x240.jpg'
-        },
-        {
-          nombre: 'Angel',
-          latitude: '-11.903469',
-          longitude: '-77.030887',
-          fotoPerfil: 'http://nativeamerican.jobs/wp-content/uploads/2017/02/person-4-240x240.jpg'
-        },
-        {
-          nombre: 'Carlos',
-          latitude: '-11.891612',
-          longitude: '-77.048232',
-          fotoPerfil: 'http://nativeamerican.jobs/wp-content/uploads/2017/02/person-4-240x240.jpg'
-        }
-        // ,
-        // {
-        //   nombre: 'Rosa',
-        //   latitude: '-11.918928',
-        //   longitude: '-77.040875',
-        //   fotoPerfil: 'http://nativeamerican.jobs/wp-content/uploads/2017/02/person-4-240x240.jpg'
-        // }
-      ]
+      dataSource: ds
     }
   }
 
-  getAllUsers = () => {
-    firebaseDatabase.ref(`users`).once('value').then(snapshot => {
-      const { uid } = firebaseAuth.currentUser,
-            obj     = snapshot.val()
-
-      const dataUsers = Object.keys(obj)
-                        .filter((key) => key.indexOf('b') === -1)
-                        .reduce((newObj, key) => Object.assign(newObj, { [key]: obj[key] }), {})
-
-      this.setState({
-        users: obj
-      })
-    })
-  }
-
   componentDidMount() {
-    this.getAllUsers()
   }
 
   componentWillUnmount() {
   }
 
   render() {
-    const { friends, dataSource, users } = this.state
-
-    console.log('this.props', this.props)
+    const { friends, dataSource} = this.state,
+          { users } = this.props
 
     return (
       <ListView
@@ -140,7 +65,7 @@ export default class Personas extends Component {
   }
 
   _handleChat(rowID) {
-    Actions.chat(this.state.friends[rowID])
+    Actions.chat(this.props.users[rowID])
   }
 }
 
