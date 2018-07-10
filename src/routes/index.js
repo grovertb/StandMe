@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import { Scene, Router, ActionConst } from 'react-native-router-flux'
 
+import Splash from '../components/Splash'
 import Login from '../components/Login'
 import Home from '../components/Home'
-import Splash from '../components/Splash'
 import Chat from '../components/Chat'
 
 export default class Routes extends React.Component {

@@ -5,7 +5,7 @@ import { firebaseAuth, firebaseDatabase } from '../utils/firebase'
 
 
 import Personas from './Personas'
-import Mensajes from './Mensajes'
+import Salas from './Salas'
 import Perfil from './Perfil'
 
 export default class Home extends Component {
@@ -13,27 +13,32 @@ export default class Home extends Component {
     super(props)
     this.state = {
       active: 'people',
-      users: []
+      users: null,
+      salas: null,
     }
   }
 
   componentDidMount() {
     this.getUserUpdate()
+    this.getSalasRefs().on('value', this.addSalas)
     this.getUserRefs('all').on('value', this.addUser)
   }
 
   componentWillUnmount() {
+    this.getUserDisconnect()
+    this.getSalasRefs().offon('value', this.addSalas)
     this.getUserRefs('all').off('value', this.addUser)
   }
 
   render() {
+    const { users, active } = this.state
+
     return (
       <View style={Styles.card}>
         <View style={{ flex: 1 }}>
-        { this.state.users.length ? <ActivityIndicator size={'large'} /> : this._renderContent() }
-        {/* { this._renderContent() } */}
+          { users ? this._renderContent() : <ActivityIndicator size={'large'} />}
         </View>
-        <BottomNavigation active={this.state.active} hidden={false} style={{ container: { justifyContent: 'space-between' } }}>
+        <BottomNavigation active={active} hidden={false} style={{ container: { justifyContent: 'space-between' } }}>
           <BottomNavigation.Action
             key="people"
             icon="people"
@@ -41,10 +46,10 @@ export default class Home extends Component {
             onPress={() => this.setState({ active: 'people' })}
           />
           <BottomNavigation.Action
-            key="mensajes"
+            key="salas"
             icon="forum"
             label="Mensajes"
-            onPress={() => this.setState({ active: 'mensajes' })}
+            onPress={() => this.setState({ active: 'salas' })}
           />
           <BottomNavigation.Action
             key="person"
@@ -58,17 +63,17 @@ export default class Home extends Component {
   }
 
   _renderContent() {
-    const { active, users } = this.state 
+    const { active, users, salas } = this.state 
     switch (active) {
       case 'people':
         return <Personas users={users} />
-      case 'mensajes':
-        return <Mensajes />
+      case 'salas':
+        return <Salas salas={salas} users={users} />
       case 'person':
         return <Perfil />
     }
   }
-  
+
   getUserUpdate = () => {
     navigator.geolocation.getCurrentPosition(
       position => {
@@ -78,6 +83,10 @@ export default class Home extends Component {
       error => console.log('error.message', error.message),
       {enableHighAccuracy: false, timeout: 20000, maximumAge: 60000},
     )
+  }
+
+  getUserDisconnect = () => {
+    this.getUserRefs().update(({ status: false }))
   }
 
   getUserRefs = (type) => {
@@ -95,6 +104,20 @@ export default class Home extends Component {
           dataUsers = Object.keys(users).filter((key) => key.indexOf(uid) === -1).reduce((newObj, key) => Object.assign(newObj, { [key]: users[key] }), {})
     this.setState({
       users: dataUsers
+    })
+  }
+
+  getSalasRefs = () => {
+    return firebaseDatabase.ref('salas')
+  }
+
+  addSalas = (data) => {
+    const { uid }   = firebaseAuth.currentUser,
+          salas     = data.val(),
+          dataSala  = Object.keys(salas).filter((key) => key.split('-').indexOf(uid) >= 0 ).reduce((newObj, key) => Object.assign(newObj, { [key]: salas[key] }), {})
+    
+    this.setState({
+      salas: dataSala
     })
   }
 }

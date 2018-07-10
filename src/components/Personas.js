@@ -11,7 +11,6 @@ import {
 } from 'react-native'
 import { Avatar } from 'react-native-material-ui'
 import { Actions }  from 'react-native-router-flux'
-import { firebaseDatabase, firebaseAuth } from './../utils/firebase'
 
 const { width, height } = Dimensions.get('window')
 
@@ -25,14 +24,8 @@ export default class Personas extends Component {
     }
   }
 
-  componentDidMount() {
-  }
-
-  componentWillUnmount() {
-  }
-
   render() {
-    const { friends, dataSource} = this.state,
+    const { friends, dataSource } = this.state,
           { users } = this.props
 
     return (
@@ -54,7 +47,7 @@ export default class Personas extends Component {
                 </View>
                 <View style={styles.contentNombre}>
                   <View style={[styles.status, styles[rowData.status ? 'bgOnline' : 'bgOffline']]} />
-                  <Text style={styles.text}>{rowData.displayName}</Text>
+                  <Text style={styles.text}>{`${rowData.displayName.substring(0, 10)}...`}</Text>
                 </View>
               </View>
             </TouchableOpacity>

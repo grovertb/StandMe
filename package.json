@@ -4,6 +4,11 @@
 	"private": true,
 	"scripts": {
 		"start": "node node_modules/react-native/local-cli/cli.js start",
+		"compile" : "cd android && gradlew assembleRelease",
+		"bundle:android": "react-native bundle --entry-file index.android.js --bundle-output android/app/src/main/assets/main.android.jsbundle --dev false --platform android --assets-dest ./android/app/src/main/res/",
+		"copy:android": "curl http://localhost:8081/index.android.bundle?platform=android -o android/app/src/main/assets/main.android.jsbundle",
+		"build:android": "npm run clear:android && npm run copy:android && npm run bundle:android",
+		"clear:android": "rm -rf android/app/src/main/assets/*.*",
 		"test": "jest"
 	},
 	"dependencies": {
